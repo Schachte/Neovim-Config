@@ -1,4 +1,4 @@
-# Neovim-Config
+# Neovim Config
 Some of my neovim configuration.
 
 ![example](https://i.imgur.com/xUVJuzi.png)
