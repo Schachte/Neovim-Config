@@ -1,7 +1,7 @@
 # Neovim Config
 Some of my neovim configuration.
 
-![example](https://i.imgur.com/xUVJuzi.png)
+![example](https://i.imgur.com/MIWi5WK.png)
 
 1) Install Neovim through your favorite package manager `brew install neovim`
 2) Ensure you install `coc` [Coc Installation Guide](https://github.com/neoclide/coc.nvim)
@@ -11,10 +11,7 @@ Throw the config into `~/.config/nvim` and you'll be good to go once the plugins
 Run `so %` to source the config then `:PlugInstall` to install the plugins. 
 
 ### High-Level Support
-- Java compilation support and highlighting
-- Gruvbox theme
+- Mirage theme
 - Nerd-tree for file exploration
-- Auto-close brackets
-- Indent guides
 - cntrlp for quick file search
-- multi-language support
+- golang support via vim-go

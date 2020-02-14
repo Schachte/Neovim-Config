@@ -1,73 +1,116 @@
+" Specify a directory for plugins
 call plug#begin('~/.vim/plugged')
-	Plug 'neoclide/coc.nvim', {'branch': 'release'}
-  Plug 'yukunlin/auto-pairs'
-  Plug 'nathanaelkane/vim-indent-guides'
-  Plug 'morhetz/gruvbox'
-  Plug 'majutsushi/tagbar'
-  Plug 'ctrlpvim/ctrlp.vim'
-  Plug 'scrooloose/nerdtree'
-  Plug 'autozimu/LanguageClient-neovim', {
-    \ 'branch': 'next',
-    \ 'do': 'bash install.sh',
-    \ }
-  Plug 'junegunn/fzf'
+	Plug 'fatih/vim-go'
+	Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
+	Plug 'ayu-theme/ayu-vim' " or other package manager
 
-  if has('nvim')
-    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-  else
-    Plug 'Shougo/deoplete.nvim'
-    Plug 'roxma/nvim-yarp'
-    Plug 'roxma/vim-hug-neovim-rpc'
-  endif
-  Plug 'Shougo/vimproc.vim', {'do' : 'make'}
-  Plug 'idanarye/vim-vebugger'
+	Plug 'scrooloose/nerdtree'
+	Plug 'Xuyuanp/nerdtree-git-plugin'
+	Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+	Plug 'ryanoasis/vim-devicons'
+	Plug 'airblade/vim-gitgutter'
+	Plug 'ctrlpvim/ctrlp.vim' " fuzzy find files
+  Plug 'mattn/vim-goimports'
 call plug#end()
 
-colorscheme gruvbox
-
-let g:deoplete#enable_at_startup = 1
-let g:indent_guides_enable_on_vim_startup = 1
-
-syntax on
+inoremap jk <ESC>
 set number
-set expandtab  
-set tabstop=4  
-set shiftwidth=2  
-set autoindent  
-set smartindent  
-set bg=dark  
-set nowrap
-set termguicolors
-set t_Co=256
+set termguicolors     " enable true colors support
+let ayucolor="mirage"   " for dark version of theme
+colorscheme ayu
+let g:go_fmt_command = 'goimports'
 
-inoremap jk <Esc>
-map <C-b> :TagbarToggle<CR>
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
+nmap <C-n> :NERDTreeToggle<CR>
+let g:NERDTreeIgnore = ['^node_modules$']
 
-let g:LanguageClient_serverCommands = {
-    \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
-    \ 'javascript': ['/usr/local/bin/javascript-typescript-stdio'],
-    \ 'javascript.jsx': ['tcp://127.0.0.1:2089'],
-    \ 'python': ['/usr/local/bin/pyls'],
-    \ 'ruby': ['~/.rbenv/shims/solargraph', 'stdio'],
-    \ }
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
+let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
 
-nnoremap <F5> :call LanguageClient_contextMenu()<CR>
-" Or map each action separately
-nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
-nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
-nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+set smarttab
+set cindent
+set tabstop=2
+set shiftwidth=2
+" always uses spaces instead of tab characters
+set expandtab
 
-" use current git repo/file director with ctrl p
-let g:ctrlp_working_path_mode = 'ra'
-"
-" Open when no files were speficied on vim launch
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+" -------------------------------------------------------------------------------------------------
+" coc.nvim default settings
+" -------------------------------------------------------------------------------------------------
 
-" Toggle nerdtree
-map <C-n> :NERDTreeToggle<CR>
+" if hidden is not set, TextEdit might fail.
+set hidden
+" Better display for messages
+set cmdheight=2
+" Smaller updatetime for CursorHold & CursorHoldI
+set updatetime=300
+" don't give |ins-completion-menu| messages.
+set shortmess+=c
+" always show signcolumns
+set signcolumn=yes
 
-set makeprg=java
-set clipboard=unnamed
+" Use tab for trigger completion with characters ahead and navigate.
+" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use `[c` and `]c` to navigate diagnostics
+nmap <silent> [c <Plug>(coc-diagnostic-prev)
+nmap <silent> ]c <Plug>(coc-diagnostic-next)
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use U to show documentation in preview window
+nnoremap <silent> U :call <SID>show_documentation()<CR>
+
+" Remap for rename current word
+nmap <leader>rn <Plug>(coc-rename)
+
+" Remap for format selected region
+vmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+" Show all diagnostics
+nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+" Manage extensions
+nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+" Show commands
+nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+" Find symbol of current document
+nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+" Search workspace symbols
+nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+" Do default action for next item.
+nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+" Do default action for previous item.
+nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+" Resume latest coc list
+nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+"router 
+
+nnoremap <leader>o :tabprevious<CR>
+nnoremap <leader>p :tabnext<CR>
+nnoremap <leader>n :tabnew<CR>
+nnoremap <leader>c :tabclose<CR>
+
+inoremap <leader>o <Esc>:tabprevious<CR>
+inoremap <leader>p <Esc>:tabnext<CR>
+inoremap <leader>n <Esc>:tabnew<CR>
+inoremap <leader>c <Esc>:tabclose<CR>
+
+" disable vim-go :GoDef short cut (gd)
+" this is handled by LanguageClient [LC]
+let g:go_def_mapping_enabled = 0
